@@ -2,10 +2,12 @@ import React from 'react';
 
 let nextId = 0;
 export default function Form() {
-  const [things, setThings] = React.useState('');
-  const [toDos, setToDos] = React.useState([]);
-  const [left, setLeft] = React.useState(false);
+  const [things, setThings] = React.useState(''); //the words that users typed in
+  const [toDos, setToDos] = React.useState([]); //contain all missions
+  const [complete, setComplete] = React.useState(false); //whether is completed
 
+  //count how many missions are left
+  const leftMisstion = toDos.filter((t) => t.complete === false).length;
   return (
     <form
       className="to-do-things"
@@ -29,7 +31,18 @@ export default function Form() {
               name="myCheckbox"
               defaultChecked={false}
               onClick={() => {
-                setLeft((left) => !left);
+                const newList = toDos.map((t) => {
+                  if (t.id === toDo.id) {
+                    return {
+                      ...t,
+                      complete: !t.complete,
+                    };
+                  } else {
+                    return t;
+                  }
+                });
+                setToDos(newList);
+                console.log(toDos);
               }}
             />{' '}
             {toDo.thing}
@@ -47,7 +60,7 @@ export default function Form() {
 
       <br />
       <br />
-      <label className="adjust-bar">
+      <div className="adjust-bar">
         <button
           onClick={() => {
             if (!things) {
@@ -55,14 +68,19 @@ export default function Form() {
             } else {
               setThings('');
               alert('Add sucessfully!');
-              setToDos([...toDos, { id: nextId++, thing: things }]);
+              setToDos([
+                ...toDos,
+                { id: nextId++, thing: things, complete: complete },
+              ]);
             }
           }}
         >
           Add Mission
         </button>{' '}
-        {!left && toDos.length} items left
-      </label>
+        <div className="encourage">
+          <span>{leftMisstion}</span> items left! keep on going! You got it 🆒
+        </div>
+      </div>
     </form>
   );
 }
