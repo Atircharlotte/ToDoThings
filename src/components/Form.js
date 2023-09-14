@@ -3,9 +3,19 @@ import React from 'react';
 let nextId = 0;
 export default function Form() {
   const [things, setThings] = React.useState(''); //the words that users typed in
-  const [toDos, setToDos] = React.useState([]); //contain all missions
+  //contain all missions
+  const [toDos, setToDos] = React.useState(() => {
+    //get the value stored in local storage
+    const saved = localStorage.getItem('thingsToDo');
+    const initialValue = JSON.parse(saved);
+    return initialValue || [];
+  });
   const [complete, setComplete] = React.useState(false); //whether is completed
 
+  //store the value in local storage
+  React.useEffect(() => {
+    localStorage.setItem('thingsToDo', JSON.stringify(toDos));
+  }, [toDos]);
   //count how many missions are left
   const leftMisstion = toDos.filter((t) => t.complete === false).length;
   return (
@@ -23,40 +33,41 @@ export default function Form() {
         onChange={(e) => setThings(e.target.value)}
       />
       <br />
-      {toDos.map((toDo) => (
-        <div className="mission">
-          <label>
-            <input
-              type="checkbox"
-              name="myCheckbox"
-              defaultChecked={false}
+      {toDos !== null &&
+        toDos.map((toDo) => (
+          <div key={toDo.id} className="mission">
+            <label>
+              <input
+                type="checkbox"
+                name="myCheckbox"
+                defaultChecked={false}
+                onClick={() => {
+                  const newList = toDos.map((t) => {
+                    if (t.id === toDo.id) {
+                      return {
+                        ...t,
+                        complete: !t.complete,
+                      };
+                    } else {
+                      return t;
+                    }
+                  });
+                  setToDos(newList);
+                  console.log(toDos);
+                }}
+              />{' '}
+              {toDo.thing}
+            </label>{' '}
+            <button
               onClick={() => {
-                const newList = toDos.map((t) => {
-                  if (t.id === toDo.id) {
-                    return {
-                      ...t,
-                      complete: !t.complete,
-                    };
-                  } else {
-                    return t;
-                  }
-                });
-                setToDos(newList);
-                console.log(toDos);
+                alert('delete sucessfully!');
+                setToDos(toDos.filter((t) => t.id !== toDo.id));
               }}
-            />{' '}
-            {toDo.thing}
-          </label>{' '}
-          <button
-            onClick={() => {
-              alert('delete sucessfully!');
-              setToDos(toDos.filter((t) => t.id !== toDo.id));
-            }}
-          >
-            Delete
-          </button>
-        </div>
-      ))}
+            >
+              Delete
+            </button>
+          </div>
+        ))}
 
       <br />
       <br />
