@@ -1,6 +1,6 @@
 import React from 'react';
 
-let nextId = 0;
+//let nextId = 0;
 export default function Form() {
   const [things, setThings] = React.useState(''); //the words that users typed in
   //contain all missions
@@ -12,12 +12,23 @@ export default function Form() {
   });
   const [complete, setComplete] = React.useState(false); //whether is completed
 
-  //store the value in local storage
+  //store the value in local storage(to do list)
   React.useEffect(() => {
     localStorage.setItem('thingsToDo', JSON.stringify(toDos));
   }, [toDos]);
+  //store the value in local storage(id number)
+  const [nextId, setNextId] = React.useState(() => {
+    const saved = localStorage.getItem('idNumber');
+    const initialValue = JSON.parse(saved);
+    return initialValue || 0;
+  });
+  React.useEffect(() => {
+    localStorage.setItem('idNumber', JSON.stringify(nextId));
+  }, [nextId]);
+
   //count how many missions are left
   const leftMisstion = toDos.filter((t) => t.complete === false).length;
+
   return (
     <form
       className="to-do-things"
@@ -53,7 +64,7 @@ export default function Form() {
                     }
                   });
                   setToDos(newList);
-                  console.log(toDos);
+                  //console.log(toDos);
                 }}
               />{' '}
               {toDo.thing}
@@ -79,9 +90,14 @@ export default function Form() {
             } else {
               setThings('');
               alert('Add sucessfully!');
+              setNextId((prev) => prev + 1);
               setToDos([
                 ...toDos,
-                { id: nextId++, thing: things, complete: complete },
+                {
+                  id: nextId,
+                  thing: things,
+                  complete: complete,
+                },
               ]);
             }
           }}
