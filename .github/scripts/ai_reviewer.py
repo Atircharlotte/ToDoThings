@@ -58,7 +58,7 @@ def generate_review(diff):
     
     # Call the model via the new client instance
     response = client.models.generate_content(
-        model="gemini-2.5-flash",
+        model="gemini-3.5-flash",
         contents=prompt
     )
     return response.text
