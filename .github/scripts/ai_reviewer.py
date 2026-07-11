@@ -1,7 +1,7 @@
 import os
 import subprocess
 import requests
-import google.genai as genai
+from google import genai
 
 # 1. Environment Setup (Injected by GitHub Actions)
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
@@ -9,7 +9,8 @@ GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN")
 GITHUB_REPOSITORY = os.environ.get("GITHUB_REPOSITORY") # e.g., "user/repo"
 COMMIT_SHA = os.environ.get("GITHUB_SHA")
 
-genai.configure(api_key=GEMINI_API_KEY)
+# Initialize the new SDK client
+client = genai.Client(api_key=GEMINI_API_KEY)
 
 def get_git_diff():
     """Fetches the diff between the current push and the previous commit."""
@@ -55,10 +56,11 @@ def generate_review(diff):
     ```
     """
     
-    # gemini-2.5-flash is extremely fast and cost-effective, 
-    # but you can swap to 'gemini-2.5-pro' for deeper architectural reasoning.
-    model = genai.GenerativeModel('gemini-2.5-flash') 
-    response = model.generate_content(prompt)
+    # Call the model via the new client instance
+    response = client.models.generate_content(
+        model="gemini-2.5-flash",
+        contents=prompt
+    )
     return response.text
 
 def post_commit_comment(review_text):
@@ -73,7 +75,6 @@ def post_commit_comment(review_text):
         "X-GitHub-Api-Version": "2022-11-28"
     }
     
-    # Add a header so you know it's from the bot
     body = f"🤖 **AI Code Review (Triggered by Push)**\n\n{review_text}"
     
     response = requests.post(url, headers=headers, json={"body": body})
