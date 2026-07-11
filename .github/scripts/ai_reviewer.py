@@ -1,7 +1,7 @@
 import os
 import subprocess
 import requests
-import google.generativeai as genai
+import google.genai as genai
 
 # 1. Environment Setup (Injected by GitHub Actions)
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")

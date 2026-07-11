@@ -3,7 +3,7 @@ name: AI Code Review on Push
 on:
   push:
     branches:
-      - main
+      #   - main
       - test # Add or remove branches you want to trigger the review
     paths-ignore:
       - '**/*.md' # Optional: skip reviews if only markdown files change
@@ -27,7 +27,7 @@ jobs:
           python-version: '3.11'
 
       - name: Install Dependencies
-        run: pip install google-generativeai requests
+        run: pip install google.genai requests
 
       - name: Run AI Code Review
         env:
